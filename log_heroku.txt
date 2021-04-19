@@ -1,0 +1,228 @@
+Саша@MSISasha MINGW64 ~/film_rec_bot_2 (main)
+$ heroku ps:exec --app
+ »   Error: Flag --app expects a value
+
+Саша@MSISasha MINGW64 ~/film_rec_bot_2 (main)
+$ heroku ps:exec
+Running this command for the first time requires a dyno restart.
+Do you want to continue? [y/n]: y
+Initializing feature... done
+Restarting dynos... done
+Waiting for web.1 to start... !
+ !    Couldn't find that dyno.
+
+Саша@MSISasha MINGW64 ~/film_rec_bot_2 (main)
+$ heroku help
+CLI to interact with Heroku
+
+VERSION
+  heroku/7.51.0 win32-x64 node-v12.21.0
+
+USAGE
+  $ heroku [COMMAND]
+
+COMMANDS
+  access          manage user access to apps
+  addons          tools and services for developing, extending, and operating
+                  your app
+  apps            manage apps on Heroku
+  auth            check 2fa status
+  authorizations  OAuth authorizations
+  autocomplete    display autocomplete installation instructions
+  buildpacks      scripts used to compile apps
+  certs           a topic for the ssl plugin
+  ci              run an application test suite on Heroku
+  clients         OAuth clients on the platform
+  config          environment variables of apps
+  container       Use containers to build and deploy Heroku apps
+  domains         custom domains for apps
+  drains          forward logs to syslog or HTTPS
+  features        add/remove app features
+  git             manage local git repository for app
+  help            display help for heroku
+  keys            add/remove account ssh keys
+  labs            add/remove experimental features
+  local           run Heroku app locally
+  logs            display recent log output
+  maintenance     enable/disable access to app
+  members         manage organization members
+  notifications   display notifications
+  orgs            manage organizations
+  pg              manage postgresql databases
+  pipelines       manage pipelines
+  plugins         list installed plugins
+  ps              Client tools for Heroku Exec
+  psql            open a psql shell to the database
+  redis           manage heroku redis instances
+  regions         list available regions for deployment
+  releases        display the releases for an app
+  reviewapps      manage reviewapps in pipelines
+  run             run a one-off process inside a Heroku dyno
+  sessions        OAuth sessions
+  spaces          manage heroku private spaces
+  status          status of the Heroku platform
+  teams           manage teams
+  update          update the Heroku CLI
+  webhooks        list webhooks on an app
+
+
+Саша@MSISasha MINGW64 ~/film_rec_bot_2 (main)
+$ heroku apps
+=== asf2003@yandex.ru Apps
+blooming-taiga-36272
+testpanterabot
+
+
+Саша@MSISasha MINGW64 ~/film_rec_bot_2 (main)
+$ heroku run
+Error: Usage: heroku run COMMAND
+Example: heroku run bash
+    at Run.run (C:/Program Files/heroku/client/node_modules/@heroku-cli/plugin-run/lib/commands/run/index.js:27:19)
+    at Run._run (C:/Program Files/heroku/client/node_modules/@oclif/command/lib/command.js:44:31)
+
+Саша@MSISasha MINGW64 ~/film_rec_bot_2 (main)
+$ heroku status
+Apps:      No known issues at this time.
+Data:      No known issues at this time.
+Tools:     No known issues at this time.
+
+Саша@MSISasha MINGW64 ~/film_rec_bot_2 (main)
+$ heroku apps
+=== asf2003@yandex.ru Apps
+blooming-taiga-36272
+testpanterabot
+
+
+Саша@MSISasha MINGW64 ~/film_rec_bot_2 (main)
+$ heroku apps help
+list your apps
+
+USAGE
+  $ heroku apps
+
+OPTIONS
+  -A, --all          include apps in all teams
+  -p, --personal     list apps in personal account when a default team is set
+  -s, --space=space  filter by space
+  -t, --team=team    team to use
+  --json             output in json format
+
+EXAMPLES
+  $ heroku apps
+  === My Apps
+  example
+  example2
+
+  === Collaborated Apps
+  theirapp   other@owner.name
+
+COMMANDS
+  apps:create     creates a new app
+  apps:destroy    permanently destroy an app
+  apps:errors     view app errors
+  apps:favorites  list favorited apps
+  apps:info       show detailed app information
+  apps:open       open the app in a web browser
+  apps:rename     rename an app
+  apps:stacks     show the list of available stacks
+  apps:join       add yourself to a team app
+  apps:leave      remove yourself from a team app
+  apps:lock       prevent team members from joining an app
+  apps:transfer   transfer applications to another user or team
+  apps:unlock     unlock an app so any team member can join
+
+
+Саша@MSISasha MINGW64 ~/film_rec_bot_2 (main)
+$ huroku run help
+bash: huroku: command not found
+
+Саша@MSISasha MINGW64 ~/film_rec_bot_2 (main)
+$ cd film_rec_bot_2
+bash: cd: film_rec_bot_2: No such file or directory
+
+Саша@MSISasha MINGW64 ~/film_rec_bot_2 (main)
+$ huroku help run
+bash: huroku: command not found
+
+Саша@MSISasha MINGW64 ~/film_rec_bot_2 (main)
+$ huroku run
+bash: huroku: command not found
+
+Саша@MSISasha MINGW64 ~/film_rec_bot_2 (main)
+$ heroku run help
+Running help on blooming-taiga-36272... starting, run.1266 (Free)
+Running help on blooming-taiga-36272... done
+Error: getaddrinfo ENOTFOUND rendezvous.runtime.heroku.com
+
+Саша@MSISasha MINGW64 ~/film_rec_bot_2 (main)
+$ huroku run main-test.py
+bash: huroku: command not found
+
+Саша@MSISasha MINGW64 ~/film_rec_bot_2 (main)
+$ huroku run main
+bash: huroku: command not found
+
+Саша@MSISasha MINGW64 ~/film_rec_bot_2 (main)
+$ heroku run main
+Running main on blooming-taiga-36272... starting, run.5748 (Free)
+Running main on blooming-taiga-36272... connecting, run.5748 (Free)Running main on blooming-taiga-36272... up, run.5748 (Free)
+bash: main: command not found
+Саша@MSISasha MINGW64 ~/film_rec_bot_2 (main)
+$ huroku run main_test.py
+bash: huroku: command not found
+
+Саша@MSISasha MINGW64 ~/film_rec_bot_2 (main)
+$ heroku run main_test.py
+Running main_test.py on blooming-taiga-36272... starting, run.1078 (Free)
+Running main_test.py on blooming-taiga-36272... connecting, run.1078 (Free)Running main_test.py on blooming-taiga-36272... up, run.1078 (Free)
+bash: main_test.py: command not found
+
+Саша@MSISasha MINGW64 ~/film_rec_bot_2 (main)
+$ heroku run main_test
+Running main_test on blooming-taiga-36272... starting, run.3076 (Free)
+Running main_test on blooming-taiga-36272... connecting, run.3076 (Free)Running main_test on blooming-taiga-36272... up, run.3076 (Free)
+bash: main_test: command not found
+
+Саша@MSISasha MINGW64 ~/film_rec_bot_2 (main)
+$ heroku help run
+run a one-off process inside a heroku dyno
+
+USAGE
+  $ heroku run
+
+OPTIONS
+  -a, --app=app        (required) parent app used by review apps
+
+  -e, --env=env        environment variables to set (use ';' to split multiple
+                       vars)
+
+  -r, --remote=remote  git remote of app to use
+
+  -s, --size=size      dyno size
+
+  -x, --exit-code      passthrough the exit code of the remote command
+
+  --no-notify          disables notification when dyno is up (alternatively use
+                       HEROKU_NOTIFICATIONS=0)
+
+  --no-tty             force the command to not run in a tty
+
+  --type=type          process type
+
+DESCRIPTION
+  Shows a notification if the dyno takes more than 20 seconds to start.
+
+EXAMPLES
+  $ heroku run bash
+  $ heroku run -s hobby -- myscript.sh -a arg1 -s arg2
+
+COMMANDS
+  run:detached  run a detached dyno, where output is sent to your logs
+
+
+Саша@MSISasha MINGW64 ~/film_rec_bot_2 (main)
+$ heroku run python main_test.py
+Running python main_test.py on blooming-taiga-36272... starting, run.8882 (Free)
+Running python main_test.py on blooming-taiga-36272... connecting, run.8882 (Free)Running python main_test.py on blooming-taiga-36272... up, run.8882 (Free)
+Start
+
