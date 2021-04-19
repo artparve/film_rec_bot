@@ -1,4 +1,4 @@
-import telebot
+from PyTelegramBotApi import telebot
 bot = telebot.TeleBot('1086758705:AAGsQ7j7vl9Q_25HI7Aiz0zMNyDsShcbyPw')
 
 operation = telebot.types.ReplyKeyboardMarkup(True, True)
