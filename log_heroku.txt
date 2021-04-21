@@ -226,3 +226,5 @@ Running python main_test.py on blooming-taiga-36272... starting, run.8882 (Free)
 Running python main_test.py on blooming-taiga-36272... connecting, run.8882 (Free)Running python main_test.py on blooming-taiga-36272... up, run.8882 (Free)
 Start
 
+Саша@MSISasha MINGW64 ~/film_rec_bot_2 (main)
+$ heroku run python main_test.py &
