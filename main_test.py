@@ -25,8 +25,7 @@ def help(update, context):
     update.message.reply_text('Help!')
 
 def error(update, context):
-    """Log Errors caused by Updates."""
-    logger.warning('Update "%s" caused error "%s"', update, context.error)
+    pass:
 
 def action(update, context):
     """Send a message when the command /help is issued."""
@@ -54,7 +53,7 @@ def get_photo(update, context):
     photo_file = update.message.photo[-1].get_file()
     # save photo
     photo_file.download('user_photo.jpg')
-    logger.info("Photo of %s: %s", user.first_name, 'user_photo.jpg')
+    # logger.info("Photo of %s: %s", user.first_name, 'user_photo.jpg')
     update.message.reply_text('Nice! Got your photo, styling...')
     
 
@@ -76,9 +75,6 @@ def main():
     dp.add_handler(MessageHandler(Filters.text, get_coef))
     dp.add_handler(MessageHandler(Filters.photo, get_photo))
 
-    # on noncommand i.e message - echo the message on Telegram
-    # log all errors
-    dp.add_error_handler(error)
 
     # Start the Bot
     updater.start_polling()
