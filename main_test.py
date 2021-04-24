@@ -1,4 +1,12 @@
+import logging
+
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+
+# Enable logging
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
+
+logger = logging.getLogger(__name__)
 
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
@@ -10,23 +18,16 @@ def start(update, context):
     else:
         name = 'Анонимус'
     update.message.reply_text('Hi, {}!'.format(name))
-    update.message.reply_text('My name is banana-ml bot. I can make your photos look like \
-                              the famous pictures! Please, choose the option: \n \
-                              - "1" Universe style; \n \
-                              - "2" Mondrian style; \n \
-                              - "3" "Starry night" style;\n\
-                              - "4" Matiss style; \n \
-                              - "5" Simpsons style; \n\
-                              - "6" Renuar style')
+    update.message.reply_text('Меня зовут ПокаБесполезныйБот, и я пока умею только здороваться')
 
 
 def help(update, context):
     """Send a message when the command /help is issued."""
-    update.message.reply_text('Help!')
+    update.message.reply_text('Это я пока не умею')
 
 def error(update, context):
     """Log Errors caused by Updates."""
-    logger.warning('Update "%s" caused error "%s"', update, context.error)
+    logger.warning(f'Update {update} caused error {context.error}')
 
 def action(update, context):
     """Send a message when the command /help is issued."""
@@ -38,26 +39,11 @@ def echo(update, context):
     """Echo the user message."""
     update.message.reply_text(update.message.text)
     
-def get_style(update, context):
+def hello(update, context):
     global option
     option = update.message.text
-    update.message.reply_text('Good! Now input coef')
-def get_coef(update, context):
-    global coef
-    coef = update.message.number
-    update.message.reply_text('Good! Now send me a pic :)')
+    update.message.reply_text('Привет!')
     
-def get_photo(update, context):
-    """Echo the user message."""
-    user = update.message.from_user
-    # get photo file
-    photo_file = update.message.photo[-1].get_file()
-    # save photo
-    photo_file.download('user_photo.jpg')
-    logger.info("Photo of %s: %s", user.first_name, 'user_photo.jpg')
-    update.message.reply_text('Nice! Got your photo, styling...')
-    
-
 
 def main():
     """Start the bot."""
@@ -70,11 +56,11 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("action", action))
+    dp.add_handler(CommandHandler("echo", echo))
 
     # on noncommand i.e message - echo the message on Telegram
-    dp.add_handler(MessageHandler(Filters.text, get_style))
-    dp.add_handler(MessageHandler(Filters.text, get_coef))
-    dp.add_handler(MessageHandler(Filters.photo, get_photo))
+    dp.add_handler(MessageHandler(Filters.text, hello))
+  
 
     # on noncommand i.e message - echo the message on Telegram
     # log all errors
