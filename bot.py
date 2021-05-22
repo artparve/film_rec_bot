@@ -3,10 +3,6 @@ import pandas as pd
 df_us_mov = pd.read_csv('df_us_mov.csv',index_col='Unnamed: 0' )
 df_users = pd.read_csv('df_users.csv',index_col='Unnamed: 0' )
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 55f1297d382641a5fd6c1d116700c9bee06c9576
 import logging
 import pandas as pd
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
