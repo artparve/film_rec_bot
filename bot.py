@@ -3,7 +3,10 @@ import pandas as pd
 df_us_mov = pd.read_csv('df_us_mov.csv',index_col='Unnamed: 0' )
 df_users = pd.read_csv('df_users.csv',index_col='Unnamed: 0' )
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 55f1297d382641a5fd6c1d116700c9bee06c9576
 import logging
 import pandas as pd
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
@@ -25,7 +28,11 @@ logger = logging.getLogger(__name__)
 
 FILM, YEARS, LOCATION, BIO,SAMENAME = range(5)
 
+<<<<<<< HEAD
 movies_df = pd.read_csv('movies.csv')	
+=======
+movies_df = pd.read_csv('movies.csv')
+>>>>>>> 55f1297d382641a5fd6c1d116700c9bee06c9576
 reply_keyboard_film = [['/cancel', 'The Gentlemen 9', 'The Tourist 7', 'Darkness 3']]
 
 def start(update: Update, context: CallbackContext) -> int:
@@ -40,7 +47,11 @@ def start(update: Update, context: CallbackContext) -> int:
         if user.id in df_users['user_id'].unique():
           hello = 'И снова здравствуйте'
           context.user_data['id']  = int(df_users['id_coded'][df_users['user_id']==user.id])
+<<<<<<< HEAD
           context.user_data['films'] = '\n'.join(list(df_us_mov['movie_id'][df_us_mov['id_coded']==context.user_data['id'] ]))+'\n'
+=======
+          context.user_data['films'] = '\n'.join(list(df_us_mov['movie_id'][df_us_mov['id_coded']==1]))+'\n'
+>>>>>>> 55f1297d382641a5fd6c1d116700c9bee06c9576
         
         else:
           hello = 'Приятно познакомиться'
@@ -61,6 +72,7 @@ def start(update: Update, context: CallbackContext) -> int:
         reply_markup=ReplyKeyboardMarkup(reply_keyboard_film),
     )
     print(user.id)
+<<<<<<< HEAD
 
     return FILM
 
@@ -161,6 +173,108 @@ def years(update: Update, context: CallbackContext) -> int:
           f'Супер, я запомнил) {film} ({years[0]})',  
           reply_markup=ReplyKeyboardMarkup(reply_keyboard_film))
     
+=======
+
+    return FILM
+
+
+def film(update: Update, context: CallbackContext) -> int:
+    df_us_mov = pd.read_csv('df_us_mov.csv',index_col='Unnamed: 0' )
+    df_users = pd.read_csv('df_users.csv', index_col='Unnamed: 0')
+    reply_keyboard = [['Да', 'Нет']]
+
+    user = update.message.from_user
+    film = update.message.text[:-2]
+    note = update.message.text[-1]
+    years = list(movies_df['year'][movies_df['title'] == film])
+    logger.info("Film of %s: %s", user.first_name, update.message.text)
+    print(f'film {update.message.text}, context.user_data: {context.user_data}')
+    
+    #если фильм уже был
+    if film in context.user_data['films']:
+      n = context.user_data['films'].find(film)+len(film)+2
+      e = context.user_data['films'][n:].find(')')
+
+      #других нет в базе - return FIL
+      if len(context.user_data['films'][n:n+e].split(' ,')) >= len(years):
+        update.message.reply_text(
+        f"Вы уже добавляли фильм {context.user_data['films'][n-len(film)-2:n+e]}. Попробуйте добавить другой", 
+        reply_markup=ReplyKeyboardMarkup(reply_keyboard_film)
+        )
+        return FILM
+
+      #другиe есть в базе
+      else:
+        # print(f'years: {years}, хочу удалить {context.user_data["films"][n+len( film)+2:n+len(film)+7]}')
+        for i in context.user_data['films'][n:n+e].split(' ,'):
+          years.remove(i)
+        context.user_data['years'] = years
+        update.message.reply_text(
+          f"Вы уже добавляли фильм {context.user_data['films'][n-len(film)-2:n+e+1]}", 
+          reply_markup=ReplyKeyboardMarkup([['Тогда ладно'], years, ['Другой год']])
+        )
+
+    #нет в базе - return FILM
+    elif len(years) < 1:
+      update.message.reply_text(
+        f"В моей базе, к сожалению, нет фильма {film}", 
+        reply_markup=ReplyKeyboardMarkup(reply_keyboard_film)
+      )
+      return FILM
+
+    #в базе такой один
+    elif len(years) == 1:
+      update.message.reply_text(
+        f"Фильм {years[0]} года правильно?", 
+        reply_markup = ReplyKeyboardMarkup(reply_keyboard)
+      )
+
+    #в базе таких много
+    else: 
+      update.message.reply_text(
+        f"Уточните год, пожалуйста...", reply_markup = ReplyKeyboardMarkup([years,['Другой']])
+      )
+
+    #обработка years
+    context.user_data['film'] = film
+    context.user_data['note'] = note
+    context.user_data['years'] = years
+    return YEARS
+
+
+def years(update: Update, context: CallbackContext) -> int:
+    df_us_mov = pd.read_csv('df_us_mov.csv',index_col='Unnamed: 0')
+    df_users = pd.read_csv('df_users.csv', index_col='Unnamed: 0')
+
+    user = update.message.from_user
+    text = update.message.text 
+    id = context.user_data['id']
+    film = context.user_data['film']
+    note = context.user_data['note']
+    years = context.user_data['years']
+
+    logger.info("ыыыыыыыыыыыы of %s: %s", user.first_name, 'ы')
+    print(f'years {update.message.text}, context.user_data: {context.user_data}')
+
+    if text in ['Нет', 'Другой', 'Тогда ладно'] or (text.isdigit() and text not in years):
+      update.message.reply_text(
+          'Тогда такого фильма нет в базе( Попробуй другой фильм', 
+          reply_markup=ReplyKeyboardMarkup(reply_keyboard_film)
+      )
+
+    elif 'да' in text.lower():
+      #добавляем в базу
+      df_us_mov.loc[len(df_us_mov)] = [id, f'{film} ({years[0]})', note]
+      print(df_us_mov)
+      df_us_mov.to_csv('df_us_mov.csv')
+      #Добавляем в список пользователя новый фильм
+      context.user_data['films'] = f'{context.user_data["films"]}{film} ({years[0]})\n'
+      #говорим об этом пользователю
+      update.message.reply_text(
+          f'Супер, я запомнил) {film} ({years[0]})',  
+          reply_markup=ReplyKeyboardMarkup(reply_keyboard_film))
+    
+>>>>>>> 55f1297d382641a5fd6c1d116700c9bee06c9576
     elif text.isdigit() and text in years:
         df_us_mov.loc[len(df_us_mov)] = [id, f'{film} ({text})', note]
         #новый год в существующие скобки
