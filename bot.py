@@ -40,8 +40,7 @@ def start(update: Update, context: CallbackContext) -> int:
         if user.id in df_users['user_id'].unique():
           hello = 'И снова здравствуйте'
           context.user_data['id']  = int(df_users['id_coded'][df_users['user_id']==user.id])
-          context.user_data['films'] = '\n'.join(list(df_us_mov['movie_id'][df_us_mov['id_coded']==context.user_data['id'] ]))+'\n'
-
+          context.user_data['films'] = '\n'.join(list(df_us_mov['movie_id'][df_us_mov['id_coded']==context.user_data['id']]))+'\n'
         
         else:
           hello = 'Приятно познакомиться'
@@ -61,7 +60,6 @@ def start(update: Update, context: CallbackContext) -> int:
         \nПример: ->The Gentlemen 9',
         reply_markup=ReplyKeyboardMarkup(reply_keyboard_film),
     )
-    print(user.id)
 
     return FILM
 
@@ -83,10 +81,10 @@ def film(update: Update, context: CallbackContext) -> int:
       n = context.user_data['films'].find(film)+len(film)+2
       e = context.user_data['films'][n:].find(')')
 
-      #других нет в базе - return FIL
-      if len(context.user_data['films'][n:n+e].split(' ,')) >= len(years):
+      #других нет в базе - return FILM
+      if len(context.user_data['films'][n:n+e].split(', ')) >= len(years):
         update.message.reply_text(
-        f"Вы уже добавляли фильм {context.user_data['films'][n-len(film)-2:n+e]}. Попробуйте добавить другой", 
+        f"Вы уже добавляли фильм {context.user_data['films'][n-len(film)-2:n+e+1]}. Попробуйте добавить другой", 
         reply_markup=ReplyKeyboardMarkup(reply_keyboard_film)
         )
         return FILM
@@ -94,7 +92,8 @@ def film(update: Update, context: CallbackContext) -> int:
       #другиe есть в базе
       else:
         # print(f'years: {years}, хочу удалить {context.user_data["films"][n+len( film)+2:n+len(film)+7]}')
-        for i in context.user_data['films'][n:n+e].split(' ,'):
+        for i in context.user_data['films'][n:n+e].split(', '):
+          print( context.user_data['films'][n:n+e].split(', '), "i: ", i)
           years.remove(i)
         context.user_data['years'] = years
         update.message.reply_text(
@@ -153,7 +152,6 @@ def years(update: Update, context: CallbackContext) -> int:
     elif 'да' in text.lower():
       #добавляем в базу
       df_us_mov.loc[len(df_us_mov)] = [id, f'{film} ({years[0]})', note]
-      print(df_us_mov)
       df_us_mov.to_csv('df_us_mov.csv')
       #Добавляем в список пользователя новый фильм
       context.user_data['films'] = f'{context.user_data["films"]}{film} ({years[0]})\n'
@@ -167,12 +165,12 @@ def years(update: Update, context: CallbackContext) -> int:
         #новый год в существующие скобки
         if film in context.user_data['films']:
           n = context.user_data['films'].find(film)
-          e = context.user_data['films'][n:].find(')')
-          context.user_data['films'] = context.user_data['films'][:e-1]+f' ,{text}'+context.user_data['films'][e:]
+          e = context.user_data['films'][n:].find(')')+1
+          context.user_data['films'] = context.user_data['films'][:e]+f', {text}'+context.user_data['films'][e:]
         #просто новый фильм 
         else:
           context.user_data['films'] = f'{context.user_data["films"]}{film} ({text})\n'
-        print(df_us_mov)
+
         df_us_mov.to_csv('df_us_mov.csv')
         update.message.reply_text(f'Супер, я запомнил) {film} ({text})', 
         reply_markup=ReplyKeyboardMarkup(reply_keyboard_film))
@@ -180,22 +178,23 @@ def years(update: Update, context: CallbackContext) -> int:
     else:
       update.message.reply_text('Я не понимаю, что-то не так с форматом, попробуй еще раз!')
       return YEARS
-    
+    print(df_us_mov[df_us_mov['id_coded'] == id])
+    df_us_mov
     del context.user_data['film']
     del context.user_data['note']
     del context.user_data['years']
     return FILM
 
 
-def skip_photo(update: Update, context: CallbackContext) -> int:
-    print(f'skip_photo {update.message.text}')
+def o_my(update: Update, context: CallbackContext) -> int:
+    print(f'o_my {update.message.text}')
     user = update.message.from_user
     logger.info("User %s did not send a photo.", user.first_name)
     update.message.reply_text(
-        'Окей, и что дальше?'
+        f'Ваши фильмы: {context.user_data["films"]}'
     )
 
-    return LOCATION
+    return FILM
 
 def skip_location(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
@@ -228,7 +227,7 @@ def cancel(update: Update, context: CallbackContext) -> int:
 
 def main() -> None:
     # Create the Updater and pass it your bot's token.
-    updater = Updater("1247859285:AAHSu4GPAOFVrpA8ZB_dJUnibLuE3UbSio4")
+    updater = Updater("1086758705:AAGsQ7j7vl9Q_25HI7Aiz0zMNyDsShcbyPw")
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
@@ -237,14 +236,14 @@ def main() -> None:
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
         states={
-            FILM: [MessageHandler(Filters.regex('^\s|\w+\s\d$'), film), 
+            FILM: [MessageHandler(Filters.regex('^\s|\w+\s\d$'), film),
+                   MessageHandler(Filters.regex('My films'), o_my), 
                    MessageHandler(Filters.regex('^\s|\w|\d*$'), what), 
                   #  MessageHandler(Filters.regex('^хватит$'), skip_photo),
                    CommandHandler('cancel', cancel)],
             YEARS: [MessageHandler(Filters.regex('^\s|\w|\d*$'), years),
-                    CommandHandler('skip', skip_photo),
                     CommandHandler('cancel', cancel)],
-            LOCATION: [MessageHandler(Filters.regex('^\s|\w|\d*$'), skip_photo),
+            LOCATION: [MessageHandler(Filters.regex('^\s|\w|\d*$'), what),
                        CommandHandler('skip', skip_location),
                        CommandHandler('cancel', cancel)],
             SAMENAME: [MessageHandler(Filters.regex('^\s|\w|\d*$'), film),
