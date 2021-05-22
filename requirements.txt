@@ -1,5 +1,1 @@
-telebot
-django
-gunicorn
-django-heroku
 python-telegram-bot
