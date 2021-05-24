@@ -22,11 +22,11 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-FILM, YEARS, LOCATION, BIO,SAMENAME = range(5)
+FILM, YEARS, LOCATION, BIO, CHECK = range(5)
 
 movies_df = pd.read_csv('movies.csv')	
 
-reply_keyboard_film = [['/cancel', 'The Gentlemen 9', 'The Tourist 7', 'Darkness 3']]
+reply_keyboard_film = [['/cancel'],['The Gentlemen 9', 'The Tourist 7', 'Darkness 3']]
 
 def start(update: Update, context: CallbackContext) -> int:
     print('start')
@@ -35,17 +35,24 @@ def start(update: Update, context: CallbackContext) -> int:
     df_us_mov = pd.read_csv('df_us_mov.csv', index_col='Unnamed: 0')
 
     user = update.effective_user
+    context.user_data['check'] = [['/cancel', 'Мои фильмы'],['Добавить оценку']]
     if user:
         name = user.first_name
+        #уже зареган
         if user.id in df_users['user_id'].unique():
           hello = 'И снова здравствуйте'
           context.user_data['id']  = int(df_users['id_coded'][df_users['user_id']==user.id])
           context.user_data['films'] = '\n'.join(list(df_us_mov['movie_id'][df_us_mov['id_coded']==context.user_data['id']]))+'\n'
-        
+          context.user_data['n_films'] = int(len(df_us_mov[df_us_mov['id_coded']==context.user_data['id']]))
+          #Можем ли советовать
+          if context.user_data['n_films'] > 5 :
+            context.user_data['check'] = [['/cancel', 'Мои фильмы'],['Добавить оценку'], ['Посоветуй фильм']]
+
+        #регистрируем
         else:
           hello = 'Приятно познакомиться'
           context.user_data['id'] = len(df_users)+1
-          context.user_data['films'] = []
+          context.user_data['films'] = ''
           df_users.loc[len(df_users)] = [user.id, len(df_users)+1]
           df_users.to_csv('df_users.csv')
           print(df_users)
@@ -56,12 +63,12 @@ def start(update: Update, context: CallbackContext) -> int:
     update.message.reply_text(
         f'{hello}, {name}! Меня зовут ПокаБесполезныйБот, и я попробую посоветовать тебе фильмы.\
         \nНо для этого мне нужно знать твои предпочтения.\
-        \nНапиши пожалуйста название фильма на английском и свою оценку для этого фильма от 0 до 9.\
+        \nНапиши пожалуйста название фильма на английском и с2вою оценку для этого фильма от 0 до 9.\
         \nПример: ->The Gentlemen 9',
-        reply_markup=ReplyKeyboardMarkup(reply_keyboard_film),
+        reply_markup=ReplyKeyboardMarkup(context.user_data['check']),
     )
 
-    return FILM
+    return CHECK
 
 
 def film(update: Update, context: CallbackContext) -> int:
@@ -81,13 +88,13 @@ def film(update: Update, context: CallbackContext) -> int:
       n = context.user_data['films'].find(film)+len(film)+2
       e = context.user_data['films'][n:].find(')')
 
-      #других нет в базе - return FILM
+      #других нет в базе - return CHECK
       if len(context.user_data['films'][n:n+e].split(', ')) >= len(years):
         update.message.reply_text(
         f"Вы уже добавляли фильм {context.user_data['films'][n-len(film)-2:n+e+1]}. Попробуйте добавить другой", 
-        reply_markup=ReplyKeyboardMarkup(reply_keyboard_film)
+        reply_markup=ReplyKeyboardMarkup(context.user_data['check'])
         )
-        return FILM
+        return CHECK
 
       #другиe есть в базе
       else:
@@ -101,13 +108,13 @@ def film(update: Update, context: CallbackContext) -> int:
           reply_markup=ReplyKeyboardMarkup([['Тогда ладно'], years, ['Другой год']])
         )
 
-    #нет в базе - return FILM
+    #нет в базе - return CHECK
     elif len(years) < 1:
       update.message.reply_text(
         f"В моей базе, к сожалению, нет фильма {film}", 
-        reply_markup=ReplyKeyboardMarkup(reply_keyboard_film)
+        reply_markup=ReplyKeyboardMarkup(context.user_data['check'])
       )
-      return FILM
+      return CHECK
 
     #в базе такой один
     elif len(years) == 1:
@@ -146,10 +153,14 @@ def years(update: Update, context: CallbackContext) -> int:
     if text in ['Нет', 'Другой', 'Тогда ладно'] or (text.isdigit() and text not in years):
       update.message.reply_text(
           'Тогда такого фильма нет в базе( Попробуй другой фильм', 
-          reply_markup=ReplyKeyboardMarkup(reply_keyboard_film)
+          reply_markup=ReplyKeyboardMarkup(context.user_data['check'])
       )
 
     elif 'да' in text.lower():
+      context.user_data['n_films'] = context.user_data['n_films']+1
+      if context.user_data['n_films']> 5:
+        context.user_data['check'] =  [['/cancel', 'Мои фильмы'],['Добавить оценку'], ['Посоветуй фильм']]
+
       #добавляем в базу
       df_us_mov.loc[len(df_us_mov)] = [id, f'{film} ({years[0]})', note]
       df_us_mov.to_csv('df_us_mov.csv')
@@ -158,13 +169,16 @@ def years(update: Update, context: CallbackContext) -> int:
       #говорим об этом пользователю
       update.message.reply_text(
           f'Супер, я запомнил) {film} ({years[0]})',  
-          reply_markup=ReplyKeyboardMarkup(reply_keyboard_film))
+          reply_markup=ReplyKeyboardMarkup(context.user_data['check']))
     
     elif text.isdigit() and text in years:
+        context.user_data['n_films'] = context.user_data['n_films']+1
+        if context.user_data['n_films']> 5:
+          context.user_data['check'] =  [['/cancel', 'Мои фильмы'],['Добавить оценку'], ['Посоветуй фильм']]
         df_us_mov.loc[len(df_us_mov)] = [id, f'{film} ({text})', note]
         #новый год в существующие скобки
         if film in context.user_data['films']:
-          n = context.user_data['films'].find(film)
+          n = context.user_data['films'].find(film)+len(film)+2
           e = context.user_data['films'][n:].find(')')+1
           context.user_data['films'] = context.user_data['films'][:e]+f', {text}'+context.user_data['films'][e:]
         #просто новый фильм 
@@ -173,7 +187,7 @@ def years(update: Update, context: CallbackContext) -> int:
 
         df_us_mov.to_csv('df_us_mov.csv')
         update.message.reply_text(f'Супер, я запомнил) {film} ({text})', 
-        reply_markup=ReplyKeyboardMarkup(reply_keyboard_film))
+        reply_markup=ReplyKeyboardMarkup(context.user_data['check']))
     
     else:
       update.message.reply_text('Я не понимаю, что-то не так с форматом, попробуй еще раз!')
@@ -183,7 +197,7 @@ def years(update: Update, context: CallbackContext) -> int:
     del context.user_data['film']
     del context.user_data['note']
     del context.user_data['years']
-    return FILM
+    return CHECK
 
 
 def o_my(update: Update, context: CallbackContext) -> int:
@@ -194,16 +208,48 @@ def o_my(update: Update, context: CallbackContext) -> int:
         f'Ваши фильмы: {context.user_data["films"]}'
     )
 
-    return FILM
+    return CHECK
 
-def skip_location(update: Update, context: CallbackContext) -> int:
-    user = update.message.from_user
-    logger.info("User %s did not send a location.", user.first_name)
-    update.message.reply_text(
-        'You seem a bit paranoid! At last, tell me something about yourself.'
-    )
 
-    return BIO
+def check(update: Update, context: CallbackContext) -> int:
+    df_us_mov = pd.read_csv('df_us_mov.csv',index_col='Unnamed: 0')
+    df_users = pd.read_csv('df_users.csv', index_col='Unnamed: 0')
+
+    text = update.message.text 
+    user = update.effective_user
+
+    logger.info("ыыыыыыыыыыыы of %s: %s", user.first_name, 'ы')
+    print(f'check {update.message.text}, context.user_data: {context.user_data}')
+
+    if text == 'Мои фильмы':
+      update.message.reply_text(
+        f'Ваши фильмы: {context.user_data["films"]}', 
+        reply_markup=ReplyKeyboardMarkup(context.user_data['check']),
+      )
+      # update.message.reply_text(
+      #     f'Сколько? У вас их {context.user_data["n_films"]} ', 
+      #     reply_markup=ReplyKeyboardMarkup([['Все'], ['Последние 10'], ['Первые 10']])
+      # )
+      return CHECK
+
+    elif text == 'Добавить оценку':
+      update.message.reply_text(
+          'Напиши пожалуйста название фильма на английском и свою оценку для этого фильма от 0 до 9.\
+        \nПример: ->The Gentlemen 9',  
+          reply_markup=ReplyKeyboardMarkup(reply_keyboard_film))
+      return FILM
+    
+    elif  text == 'Посоветуй фильм':
+      update.message.reply_text(f'Супер, я запомнил) {film} ({text})', 
+        reply_markup=ReplyKeyboardMarkup(reply_keyboard_film))
+      return REC
+
+    
+    else:
+      update.message.reply_sticker('CAACAgIAAxkBAAECVbRgq7CXFs7tiP1DLrUESfzIsV_t6wACDgADwDZPEyNXFESHbtZlHwQ')
+      update.message.reply_text('Я так не умею, нажми пожалуйста на одну из предложеных кнопочек!')
+    
+      return CHECK
 
 
 def what(update: Update, context: CallbackContext) -> int:
@@ -225,6 +271,7 @@ def cancel(update: Update, context: CallbackContext) -> int:
     return ConversationHandler.END
 
 
+
 def main() -> None:
     # Create the Updater and pass it your bot's token.
     updater = Updater("1247859285:AAHSu4GPAOFVrpA8ZB_dJUnibLuE3UbSio4")
@@ -236,25 +283,31 @@ def main() -> None:
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
         states={
-            FILM: [MessageHandler(Filters.regex('^\s|\w+\s\d$'), film),
+            FILM: [CommandHandler('cancel', cancel),
+                   MessageHandler(Filters.regex('^.+\s\d$'), film),
                    MessageHandler(Filters.regex('My films'), o_my), 
-                   MessageHandler(Filters.regex('^\s|\w|\d*$'), what), 
-                  #  MessageHandler(Filters.regex('^хватит$'), skip_photo),
-                   CommandHandler('cancel', cancel)],
-            YEARS: [MessageHandler(Filters.regex('^\s|\w|\d*$'), years),
-                    CommandHandler('cancel', cancel)],
-            LOCATION: [MessageHandler(Filters.regex('^\s|\w|\d*$'), what),
-                       CommandHandler('skip', skip_location),
-                       CommandHandler('cancel', cancel)],
-            SAMENAME: [MessageHandler(Filters.regex('^\s|\w|\d*$'), film),
-                       CommandHandler('skip', skip_location),
-                       CommandHandler('cancel', cancel)]
+                   MessageHandler(Filters.regex('^\s|\w|\d*$'), what),
+                #  MessageHandler(Filters.regex('^хватит$'), skip_photo),
+                   ],
+            YEARS: [CommandHandler('cancel', cancel),
+                    MessageHandler(Filters.regex('^\s|\w|\d*$'), years),
+                    ],
+            LOCATION: [CommandHandler('cancel', cancel),
+                       MessageHandler(Filters.regex('^\s|\w|\d*$'), what),
+                       ],
+            CHECK: [CommandHandler('cancel', cancel),
+                    MessageHandler(Filters.regex('^\s|\w|\d*$'), check),
+                       ]
                      # MessageHandler(Filters.regex('^\s|\w|\d*$'), what)],LOCATION: [MessageHandler(Filters.regex('^*$'), photo),
                 },
         fallbacks=[CommandHandler('cancel', cancel)],
     )
 
     dispatcher.add_handler(conv_handler)
+
+
+if __name__ == '__main__':
+    main()
 
     # Start the Bot
     updater.start_polling()
@@ -264,6 +317,4 @@ def main() -> None:
     # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
 
-
-if __name__ == '__main__':
-    main()
+    # updater = Updater("1247859285:AAHSu4GPAOFVrpA8ZB_dJUnibLuE3UbSio4")
