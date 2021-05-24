@@ -305,10 +305,6 @@ def main() -> None:
 
     dispatcher.add_handler(conv_handler)
 
-
-if __name__ == '__main__':
-    main()
-
     # Start the Bot
     updater.start_polling()
 
@@ -316,5 +312,9 @@ if __name__ == '__main__':
     # SIGTERM or SIGABRT. This should be used most of the time, since
     # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
+
+
+if __name__ == '__main__':
+  main()
 
     # updater = Updater("1247859285:AAHSu4GPAOFVrpA8ZB_dJUnibLuE3UbSio4")
