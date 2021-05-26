@@ -45,7 +45,7 @@ def start(update: Update, context: CallbackContext) -> int:
     if user:
         name = user.first_name
         #уже зареган
-       if user.id in df_users['user_id'].unique():
+        if user.id in df_users['user_id'].unique():
           hello = 'И снова здравствуйте'
           if 'continued' not in context.user_data.keys():
             context.user_data['id']  = int(df_users['id_coded'][df_users['user_id']==user.id])
