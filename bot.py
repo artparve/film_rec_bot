@@ -4,7 +4,6 @@ df_us_mov = pd.read_csv('df_us_mov.csv',index_col='Unnamed: 0' )
 df_users = pd.read_csv('df_users.csv',index_col='Unnamed: 0' )
 
 import logging
-import pandas as pd
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (
     Updater,
@@ -28,6 +27,11 @@ movies_df = pd.read_csv('movies.csv')
 
 reply_keyboard_film = [['/cancel'],['The Gentlemen 9', 'The Tourist 7', 'Darkness 3']]
 
+movies_df_rec_best = pd.read_csv('movies_df_rec_best.csv',index_col='Unnamed: 0')
+import random
+def recomendation(genre = 'none'):
+  if genre == 'none':
+    return movies_df_rec_best.unique()[random.randint(0, 254)]
 
 def start(update: Update, context: CallbackContext) -> int:
     print('start')
