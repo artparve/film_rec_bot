@@ -280,7 +280,7 @@ def cancel(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     logger.info("User %s canceled the conversation.", user.first_name)
     update.message.reply_text(
-        'Закончим на сегодня, пока)', reply_markup=ReplyKeyboardRemove()
+        'Закончим на сегодня, пока)', reply_markup=ReplyKeyboardMarkup([['/start']])
     )
     df_us_mov.to_csv('df_us_mov.csv')
     return ConversationHandler.END
