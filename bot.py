@@ -22,11 +22,12 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-FILM, YEARS, LOCATION, BIO, CHECK = range(5)
+FILM, YEARS, REC, BIO, CHECK = range(5)
 
 movies_df = pd.read_csv('movies.csv')	
 
 reply_keyboard_film = [['/cancel'],['The Gentlemen 9', 'The Tourist 7', 'Darkness 3']]
+
 
 def start(update: Update, context: CallbackContext) -> int:
     print('start')
@@ -173,14 +174,14 @@ def years(update: Update, context: CallbackContext) -> int:
     
     elif text.isdigit() and text in years:
         context.user_data['n_films'] = context.user_data['n_films']+1
-        if context.user_data['n_films']> 5:
+        if context.user_data['n_films']> 4:
           context.user_data['check'] =  [['/cancel', 'Мои фильмы'],['Добавить оценку'], ['Посоветуй фильм']]
         df_us_mov.loc[len(df_us_mov)] = [id, f'{film} ({text})', note]
         #новый год в существующие скобки
         if film in context.user_data['films']:
           n = context.user_data['films'].find(film)+len(film)+2
-          e = context.user_data['films'][n:].find(')')+1
-          context.user_data['films'] = context.user_data['films'][:e]+f', {text}'+context.user_data['films'][e:]
+          e = context.user_data['films'][n:].find(')')
+          context.user_data['films'] = context.user_data['films'][:n+e]+f', {text}'+context.user_data['films'][n+e:]
         #просто новый фильм 
         else:
           context.user_data['films'] = f'{context.user_data["films"]}{film} ({text})\n'
@@ -240,8 +241,8 @@ def check(update: Update, context: CallbackContext) -> int:
       return FILM
     
     elif  text == 'Посоветуй фильм':
-      update.message.reply_text(f'Супер, я запомнил) {film} ({text})', 
-        reply_markup=ReplyKeyboardMarkup(reply_keyboard_film))
+      update.message.reply_text(f'Какой жанр?', 
+        reply_markup=ReplyKeyboardMarkup([['Не важно'], ['Драма', 'Мелодрама']]))
       return REC
 
     
@@ -251,6 +252,16 @@ def check(update: Update, context: CallbackContext) -> int:
     
       return CHECK
 
+def rec(update: Update, context: CallbackContext) -> int:
+    print(f'rec {update.message.text}')
+    user = update.message.from_user
+    logger.info("User %s in rec.", user.first_name)
+    # df_us_mov[df_us_mov['id_coded']==context.user_data['id']][df_us_mov['note']  ]
+    update.message.reply_text(
+        f'Вам может понравиться фильм {recomendation()}',
+        reply_markup=ReplyKeyboardMarkup(context.user_data['check']),
+      )
+    return CHECK
 
 def what(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
@@ -292,8 +303,8 @@ def main() -> None:
             YEARS: [CommandHandler('cancel', cancel),
                     MessageHandler(Filters.regex('^\s|\w|\d*$'), years),
                     ],
-            LOCATION: [CommandHandler('cancel', cancel),
-                       MessageHandler(Filters.regex('^\s|\w|\d*$'), what),
+            REC: [CommandHandler('cancel', cancel),
+                       MessageHandler(Filters.regex('^\s|\w|\d*$'), rec),
                        ],
             CHECK: [CommandHandler('cancel', cancel),
                     MessageHandler(Filters.regex('^\s|\w|\d*$'), check),
