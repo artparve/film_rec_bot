@@ -28,6 +28,7 @@ movies_df = pd.read_csv('movies.csv')
 reply_keyboard_film = [['/cancel'],['The Gentlemen 9', 'The Tourist 7', 'Darkness 3']]
 
 movies_df_rec_best = pd.read_csv('movies_df_rec_best.csv',index_col='Unnamed: 0')
+
 import random
 def recomendation(genre = 'none'):
   if genre == 'none':
@@ -44,11 +45,12 @@ def start(update: Update, context: CallbackContext) -> int:
     if user:
         name = user.first_name
         #уже зареган
-        if user.id in df_users['user_id'].unique():
+       if user.id in df_users['user_id'].unique():
           hello = 'И снова здравствуйте'
-          context.user_data['id']  = int(df_users['id_coded'][df_users['user_id']==user.id])
-          context.user_data['films'] = '\n'.join(list(df_us_mov['movie_id'][df_us_mov['id_coded']==context.user_data['id']]))+'\n'
-          context.user_data['n_films'] = int(len(df_us_mov[df_us_mov['id_coded']==context.user_data['id']]))
+          if 'continued' not in context.user_data.keys():
+            context.user_data['id']  = int(df_users['id_coded'][df_users['user_id']==user.id])
+            context.user_data['films'] = '\n'.join(list(df_us_mov['movie_id'][df_us_mov['id_coded']==context.user_data['id']]))+'\n'
+            context.user_data['n_films'] = int(len(df_us_mov[df_us_mov['id_coded']==context.user_data['id']]))
           #Можем ли советовать
           if context.user_data['n_films'] > 5 :
             context.user_data['check'] = [['/cancel', 'Мои фильмы'],['Добавить оценку'], ['Посоветуй фильм']]
@@ -282,6 +284,7 @@ def cancel(update: Update, context: CallbackContext) -> int:
     update.message.reply_text(
         'Закончим на сегодня, пока)', reply_markup=ReplyKeyboardMarkup([['/start']])
     )
+    context.user_data['continued'] = 1
     df_us_mov.to_csv('df_us_mov.csv')
     return ConversationHandler.END
 
