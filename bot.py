@@ -278,7 +278,7 @@ def cancel(update: Update, context: CallbackContext) -> int:
     update.message.reply_text(
         'Закончим на сегодня, пока)', reply_markup=ReplyKeyboardRemove()
     )
-
+    df_us_mov.to_csv('df_us_mov.csv')
     return ConversationHandler.END
 
 
