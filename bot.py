@@ -285,7 +285,7 @@ def cancel(update: Update, context: CallbackContext) -> int:
         'Закончим на сегодня, пока)', reply_markup=ReplyKeyboardMarkup([['/start']])
     )
     context.user_data['continued'] = 1
-    df_us_mov.to_csv('df_us_mov.csv')
+    df_us_mov.to_csv('df_us_mov_updated.csv')
     return ConversationHandler.END
 
 
