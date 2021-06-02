@@ -25,7 +25,7 @@ FILM, YEARS, REC, BIO, CHECK = range(5)
 
 movies_df = pd.read_csv('movies.csv')	
 
-reply_keyboard_film = [['/cancel'],['The Gentlemen 9', 'The Tourist 7', 'Darkness 3']]
+reply_keyboard_film = [['/cancel'],['The Gentlemen 9', 'Friends 7', 'We 3']]
 
 movies_df_rec_best = pd.read_csv('movies_df_rec_best.csv',index_col='Unnamed: 0')
 
@@ -68,10 +68,9 @@ def start(update: Update, context: CallbackContext) -> int:
         name = 'Анонимус! Раз уж ты решил остаться анонимным, то запомнить твои предпочтения в кино я не смогу'
 
     update.message.reply_text(
-        f'{hello}, {name}! Меня зовут ПокаБесполезныйБот, и я попробую посоветовать тебе фильмы.\
-        \nНо для этого мне нужно знать твои предпочтения.\
-        \nНапиши пожалуйста название фильма на английском и с2вою оценку для этого фильма от 0 до 9.\
-        \nПример: ->The Gentlemen 9',
+        f'{hello}, {name}! Меня зовут, Moviedvice! Я попробую посоветовать тебе фильмы.\
+        \nНо для этого мне нужно знать твои предпочтения. \
+        \nКак только введешь 5 фильмов - появится опция рекомендации\',
         reply_markup=ReplyKeyboardMarkup(context.user_data['check']),
     )
 
@@ -272,7 +271,8 @@ def rec(update: Update, context: CallbackContext) -> int:
 def what(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     print(f'what {update.message.text}')
-    update.message.reply_text('Я не понимаю, что-то не так с форматом, попробуй еще раз!', 
+    update.message.reply_text('Я не понимаю, что-то не так с форматом, попробуй еще раз! \
+      Возможно ты писал название не на английском или не поставил в конце цифру оценки', 
         reply_markup=ReplyKeyboardMarkup(reply_keyboard_film))
 
     return FILM
