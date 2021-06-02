@@ -70,7 +70,7 @@ def start(update: Update, context: CallbackContext) -> int:
     update.message.reply_text(
         f'{hello}, {name}! Меня зовут, Moviedvice! Я попробую посоветовать тебе фильмы.\
         \nНо для этого мне нужно знать твои предпочтения. \
-        \nКак только введешь 5 фильмов - появится опция рекомендации\',
+        \nКак только введешь 5 фильмов - появится опция рекомендации',
         reply_markup=ReplyKeyboardMarkup(context.user_data['check']),
     )
 
