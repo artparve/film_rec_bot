@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 FILM, YEARS, REC, BIO, CHECK = range(5)
 
-movies_df = pd.read_csv('movies.csv')	
+movies_df = pd.read_csv('movies_df.csv')	
 
 reply_keyboard_film = [['/cancel'],['The Gentlemen 9', 'Friends 7', 'We 3']]
 
