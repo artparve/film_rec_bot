@@ -246,8 +246,8 @@ def check(update: Update, context: CallbackContext) -> int:
       return FILM
     
     elif  text == 'Посоветуй фильм':
-      update.message.reply_text(f'Какой жанр?', 
-        reply_markup=ReplyKeyboardMarkup([['Не важно'], ['Драма', 'Мелодрама']]))
+      update.message.reply_text(f'А пожалуйста?', 
+        reply_markup=ReplyKeyboardMarkup([['Пожалуйста']]))
       return REC
 
     
